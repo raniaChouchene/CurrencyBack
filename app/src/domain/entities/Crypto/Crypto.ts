@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const CryptoSchema = new mongoose.Schema({
   id: String,
@@ -9,4 +9,4 @@ const CryptoSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("Crypto", CryptoSchema);
+export default mongoose.model("Crypto", CryptoSchema);

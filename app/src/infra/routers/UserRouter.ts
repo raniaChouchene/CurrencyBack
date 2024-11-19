@@ -11,15 +11,15 @@ const router = Router();
 const userRepository = new UserRepository();
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const userController = new UserController(createUserUseCase);
+router.get("/test", (req, res) => {
+  res.status(200).send("Test route is working!");
+});
 
-// Home
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
   userController.index
 );
-
-// Register
 
 router.post("/login", generateJWT);
 
