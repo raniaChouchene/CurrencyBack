@@ -6,7 +6,7 @@ const CryptoSchema = new mongoose.Schema({
   price: Number,
   volume: Number,
   marketCap: Number,
-  timestamp: { type: Date, default: Date.now },
+  timestamp: { type: Date, default: Date.now }
 });
 
 export default mongoose.model("Crypto", CryptoSchema);

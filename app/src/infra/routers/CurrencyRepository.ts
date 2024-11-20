@@ -1,7 +1,8 @@
 import { Router } from "express";
 
-import { CurrencyRepository } from "../repositories/CurrencyRepository";
 import { saveCryptoDataToDB } from "~/application/controllers/CryptoController";
+import Crypto from "~/domain/entities/Crypto/Crypto";
+import { CurrencyRepository } from "../repositories/CurrencyRepository";
 
 const router = Router();
 router.get("/test", (req, res) => {
@@ -24,6 +25,20 @@ router.get("/", async (req, res) => {
     res.status(200).json(data);
   } catch (error) {
     res.status(500).send("Error fetching crypto data.");
+  }
+});
+router.get("/prices/:cryptoId", async (req, res) => {
+  const { cryptoId } = req.params;
+
+  try {
+    const prices = await Crypto.find({ id: cryptoId })
+      .sort({ timestamp: 1 })
+      .select("timestamp price -_id");
+
+    res.status(200).json(prices);
+  } catch (error) {
+    console.error("Error fetching crypto prices:", error);
+    res.status(500).json({ error: "Unable to fetch prices" });
   }
 });
 

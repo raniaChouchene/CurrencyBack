@@ -1,3 +1,3 @@
-import { IUser } from './IUser';
+import { IUser } from "./IUser";
 
-export type IUserCreateData = Omit<IUser, 'id'>
+export type IUserCreateData = Omit<IUser, "id">

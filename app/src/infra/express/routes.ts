@@ -8,6 +8,6 @@ const router = Router();
 
 router.use("/users", userRouter);
 router.use("/cryptocurrencies", currencyRouter);
-//router.use(passport.authenticate("jwt", { session: true }));
+// router.use(passport.authenticate("jwt", { session: true }));
 
 export { router };

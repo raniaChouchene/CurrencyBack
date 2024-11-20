@@ -1,8 +1,8 @@
-import { IUserRepository } from '~/application/repositories/IUserRepository';
-import { IUser } from '~/domain/entities/User/IUser';
-import { IUserCreateData } from '~/domain/entities/User/IUserCreateData';
-import { IUserFindOneData } from '~/domain/entities/User/IUserFindOneData';
-import User from '~/domain/entities/User/User';
+import { IUserRepository } from "~/application/repositories/IUserRepository";
+import { IUser } from "~/domain/entities/User/IUser";
+import { IUserCreateData } from "~/domain/entities/User/IUserCreateData";
+import { IUserFindOneData } from "~/domain/entities/User/IUserFindOneData";
+import User from "~/domain/entities/User/User";
 
 class UserRepository implements IUserRepository {
   async create(data: IUserCreateData): Promise<IUser> {

@@ -14,13 +14,13 @@ class CurrencyRepository implements IcurrencyRepository {
 
   async saveCryptoData(data: any) {
     try {
-      for (let item of data) {
+      for (const item of data) {
         const crypto = new Crypto({
           id: item.id,
           name: item.name,
           price: parseFloat(item.priceUsd),
           volume: parseFloat(item.volumeUsd24Hr),
-          marketCap: parseFloat(item.marketCapUsd),
+          marketCap: parseFloat(item.marketCapUsd)
         });
         await crypto.save();
       }

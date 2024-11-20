@@ -29,7 +29,7 @@ class UserController {
     userData.password = passwordHash;
 
     const userAlreadyExists = await User.findOne({
-      username: userData.username,
+      username: userData.username
     });
 
     if (userAlreadyExists) {
