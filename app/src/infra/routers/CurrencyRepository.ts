@@ -41,5 +41,15 @@ router.get("/prices/:cryptoId", async (req, res) => {
     res.status(500).json({ error: "Unable to fetch prices" });
   }
 });
+router.get("/most-recent", async (req, res) => {
+  try {
+    const currencyRepository = new CurrencyRepository();
+    const mostRecentData = await currencyRepository.getMostRecentPrices();
+    res.status(200).json(mostRecentData);
+  } catch (error) {
+    console.error("Error fetching most recent crypto data:", error);
+    res.status(500).json({ error: "Unable to fetch most recent crypto data." });
+  }
+});
 
 export { router as currencyRouter };
