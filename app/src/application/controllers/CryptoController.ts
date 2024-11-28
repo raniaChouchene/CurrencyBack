@@ -32,6 +32,15 @@ export const saveCryptoDataToDB = async () => {
     throw error;
   }
 };
-
+export const getMostRecentCryptoPrices = async () => {
+  try {
+    const currencyRepository = new CurrencyRepository();
+    const recentPrices = await currencyRepository.getMostRecentPrices();
+    return recentPrices;
+  } catch (error) {
+    console.error("Error fetching the most recent crypto prices:", error);
+    throw error;
+  }
+};
 // Schedule the task to run every minute
 cron.schedule("* * * * *", saveCryptoDataToDB);

@@ -65,6 +65,43 @@ class CurrencyRepository implements IcurrencyRepository {
       throw error;
     }
   }
+
+  async getLast30CryptoPrices() {
+    try {
+      const data = await Crypto.aggregate([
+        {
+          $sort: { timestamp: -1 }, // Sort by timestamp in descending order
+        },
+        {
+          $group: {
+            _id: "$name", // Group by cryptocurrency name
+            data: {
+              $push: {
+                timestamp: "$timestamp",
+                value: "$price",
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            name: "$_id",
+            data: { $slice: ["$data", 30] }, // Take the last 30 records
+          },
+        },
+      ]);
+
+      // Reverse the data for chronological order
+      return data.map((crypto) => ({
+        name: crypto.name,
+        data: crypto.data.reverse(),
+      }));
+    } catch (error) {
+      console.error("Error fetching last 30 crypto prices:", error);
+      throw error;
+    }
+  }
 }
 
 export { CurrencyRepository };

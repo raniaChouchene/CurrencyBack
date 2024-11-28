@@ -2,7 +2,7 @@ import { Router } from "express";
 import { userRouter } from "~/infra/routers/UserRouter";
 
 import passport from "passport";
-import { currencyRouter } from "../routers/CurrencyRepository";
+import { currencyRouter } from "../routers/CurrencyRouter";
 
 const router = Router();
 
