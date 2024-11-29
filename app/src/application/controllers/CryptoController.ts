@@ -42,5 +42,5 @@ export const getMostRecentCryptoPrices = async () => {
     throw error;
   }
 };
-// Schedule the task to run every minute
+
 cron.schedule("* * * * *", saveCryptoDataToDB);
