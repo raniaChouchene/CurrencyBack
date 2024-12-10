@@ -4,7 +4,12 @@ module.exports = {
   testMatch: ["**/?(*.)+(spec|test).[tj]s?(x)"],
   globals: {
     "ts-jest": {
-      tsconfig: "tsconfig.json", // Assurez-vous que tsconfig est utilisé
+      tsconfig: "tsconfig.json",
     },
   },
+  preset: "js-jest",
+  testEnvironment: "node",
+  collectCoverage: true,
+  coverageDirectory: "coverage",
+  coverageReporters: ["text", "lcov"],
 };

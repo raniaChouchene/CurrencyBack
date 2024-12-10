@@ -1,6 +1,9 @@
 import { Router } from "express";
 
-import { saveCryptoDataToDB } from "~/application/controllers/CryptoController";
+import {
+  displayHistoricalCryptoData,
+  saveCryptoDataToDB,
+} from "~/application/controllers/CryptoController";
 import Crypto from "~/domain/entities/Crypto/Crypto";
 import { CurrencyRepository } from "../repositories/CurrencyRepository";
 
@@ -61,5 +64,25 @@ router.get("/crypto-prices", async (req, res) => {
     res.status(500).json({ message: "Error fetching crypto prices" });
   }
 });
+router.get("/historical-data", async (req, res) => {
+  const { currencyName, period } = req.query;
 
+  if (!currencyName || !period) {
+    return res
+      .status(400)
+      .json({ error: "currencyName and period are required." });
+  }
+
+  try {
+    // Call the function with the currency name and period
+    const data = await displayHistoricalCryptoData(
+      currencyName as string,
+      period as string
+    );
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error displaying historical crypto data:", error);
+    res.status(500).send("Error displaying historical crypto data.");
+  }
+});
 export { router as currencyRouter };

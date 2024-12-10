@@ -5,21 +5,6 @@ import { UserController } from "~/application/controllers/UserController";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 
-jest.mock("mongoose", () => ({
-  ...(jest.requireActual("mongoose") as object),
-  model: jest.fn().mockImplementation(() => ({
-    //@ts-expect-error
-    findOne: jest.fn().mockResolvedValue(null),
-    create: jest.fn((data) => {
-      return Promise.resolve({
-        _id: "123456789",
-        //@ts-expect-error
-        ...data,
-      });
-    }),
-  })),
-}));
-
 const mockCreateUseCase = {
   //@ts-expect-error
   create: jest.fn().mockResolvedValue({

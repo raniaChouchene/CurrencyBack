@@ -2,24 +2,22 @@ import axios from "axios";
 import { CurrencyRepository } from "~/infra/repositories/CurrencyRepository";
 import cron from "node-cron";
 
-// Function to fetch cryptocurrency data from the API
 export const getCryptoData = async () => {
   try {
     const response = await axios.get("https://api.coincap.io/v2/assets");
-    return response.data.data.slice(0, 10); // Fetch the top 10 cryptocurrencies
+    return response.data.data.slice(0, 10);
   } catch (error) {
     console.error("Error fetching crypto data:", error);
     throw error;
   }
 };
 
-// Function to save the fetched data into the database
 export const saveCryptoDataToDB = async () => {
   try {
     const data = await getCryptoData();
     const timestampedData = data.map((crypto) => ({
       ...crypto,
-      timestamp: new Date().toISOString(), // Add a timestamp for tracking
+      timestamp: new Date().toISOString(),
     }));
     const currencyRepository = new CurrencyRepository();
     await currencyRepository.saveCryptoData(timestampedData);
@@ -39,6 +37,40 @@ export const getMostRecentCryptoPrices = async () => {
     return recentPrices;
   } catch (error) {
     console.error("Error fetching the most recent crypto prices:", error);
+    throw error;
+  }
+};
+export const displayHistoricalCryptoData = async (
+  currencyName: string,
+  period: string
+) => {
+  try {
+    const currencyRepository = new CurrencyRepository();
+    const allData = await currencyRepository.getAllCryptoData();
+
+    // Validate period input
+    if (period !== "month" && period !== "year") {
+      throw new Error("Invalid period. Please specify 'month' or 'year'.");
+    }
+
+    // Set the date range based on the period
+    let startDate = new Date();
+    if (period === "month") {
+      startDate.setMonth(startDate.getMonth() - 1); // Last month
+    } else if (period === "year") {
+      startDate.setFullYear(startDate.getFullYear() - 1); // Last year
+    }
+
+    // Filter the data based on currency name and the time period
+    const filteredData = allData.filter((crypto) => {
+      const timestamp = new Date(crypto.timestamp);
+      return crypto.name === currencyName && timestamp >= startDate;
+    });
+
+    // Return the filtered data
+    return filteredData;
+  } catch (error) {
+    console.error("Error fetching historical crypto data:", error);
     throw error;
   }
 };
