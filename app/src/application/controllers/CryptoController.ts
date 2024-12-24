@@ -48,20 +48,17 @@ export const displayHistoricalCryptoData = async (
     const currencyRepository = new CurrencyRepository();
     const allData = await currencyRepository.getAllCryptoData();
 
-    // Validate period input
     if (period !== "month" && period !== "year") {
       throw new Error("Invalid period. Please specify 'month' or 'year'.");
     }
 
-    // Set the date range based on the period
     let startDate = new Date();
     if (period === "month") {
-      startDate.setMonth(startDate.getMonth() - 1); // Last month
+      startDate.setMonth(startDate.getMonth() - 1);
     } else if (period === "year") {
-      startDate.setFullYear(startDate.getFullYear() - 1); // Last year
+      startDate.setFullYear(startDate.getFullYear() - 1);
     }
 
-    // Filter the data based on currency name and the time period
     const filteredData = allData.filter((crypto) => {
       const timestamp = new Date(crypto.timestamp);
       return crypto.name === currencyName && timestamp >= startDate;
