@@ -1,12 +1,13 @@
 import { Router } from "express";
 import {
+  deleteAlert,
   fetchAlertHistory,
   handleSetAlert,
 } from "~/application/controllers/AlertContoller";
 
 const router = Router();
 
-router.post("/alert/alerts", async (req, res) => {
+router.post("/alerts", async (req, res) => {
   try {
     await handleSetAlert(req, res);
   } catch (error) {

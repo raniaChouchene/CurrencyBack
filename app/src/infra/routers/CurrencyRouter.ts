@@ -74,7 +74,6 @@ router.get("/historical-data", async (req, res) => {
   }
 
   try {
-    // Call the function with the currency name and period
     const data = await displayHistoricalCryptoData(
       currencyName as string,
       period as string
@@ -85,4 +84,5 @@ router.get("/historical-data", async (req, res) => {
     res.status(500).send("Error displaying historical crypto data.");
   }
 });
+
 export { router as currencyRouter };
