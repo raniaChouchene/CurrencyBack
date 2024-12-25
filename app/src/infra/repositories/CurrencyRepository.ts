@@ -70,11 +70,11 @@ class CurrencyRepository implements IcurrencyRepository {
     try {
       const data = await Crypto.aggregate([
         {
-          $sort: { timestamp: -1 }, // Sort by timestamp in descending order
+          $sort: { timestamp: -1 },
         },
         {
           $group: {
-            _id: "$name", // Group by cryptocurrency name
+            _id: "$name",
             data: {
               $push: {
                 timestamp: "$timestamp",
@@ -87,12 +87,11 @@ class CurrencyRepository implements IcurrencyRepository {
           $project: {
             _id: 0,
             name: "$_id",
-            data: { $slice: ["$data", 30] }, // Take the last 30 records
+            data: { $slice: ["$data", 30] },
           },
         },
       ]);
 
-      // Reverse the data for chronological order
       return data.map((crypto) => ({
         name: crypto.name,
         data: crypto.data.reverse(),

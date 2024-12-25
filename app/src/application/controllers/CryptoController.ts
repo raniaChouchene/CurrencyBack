@@ -48,15 +48,16 @@ export const displayHistoricalCryptoData = async (
     const currencyRepository = new CurrencyRepository();
     const allData = await currencyRepository.getAllCryptoData();
 
-    if (period !== "month" && period !== "year") {
-      throw new Error("Invalid period. Please specify 'month' or 'year'.");
+    if (period !== "month" && period !== "week") {
+      throw new Error("Invalid period. Please specify 'month' or 'week'.");
     }
 
+    const currentDate = new Date();
     let startDate = new Date();
     if (period === "month") {
-      startDate.setMonth(startDate.getMonth() - 1);
-    } else if (period === "year") {
-      startDate.setFullYear(startDate.getFullYear() - 1);
+      startDate.setMonth(currentDate.getMonth() - 1);
+    } else if (period === "week") {
+      startDate.setDate(currentDate.getDate() - 7);
     }
 
     const filteredData = allData.filter((crypto) => {
@@ -64,8 +65,13 @@ export const displayHistoricalCryptoData = async (
       return crypto.name === currencyName && timestamp >= startDate;
     });
 
-    // Return the filtered data
-    return filteredData;
+    const sortedData = filteredData.sort((a, b) => {
+      const dateA = new Date(a.timestamp);
+      const dateB = new Date(b.timestamp);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    return sortedData.slice(0, 30);
   } catch (error) {
     console.error("Error fetching historical crypto data:", error);
     throw error;

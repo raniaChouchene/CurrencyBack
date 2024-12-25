@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  deleteAlert,
   fetchAlertHistory,
   handleSetAlert,
 } from "~/application/controllers/AlertContoller";
