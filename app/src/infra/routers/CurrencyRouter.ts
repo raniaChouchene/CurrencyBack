@@ -1,13 +1,14 @@
-import { Router } from "express";
-
+import { Router, Request, Response } from "express";
 import {
   displayHistoricalCryptoData,
+  forecastCryptoPrices,
   saveCryptoDataToDB,
 } from "~/application/controllers/CryptoController";
 import Crypto from "~/domain/entities/Crypto/Crypto";
 import { CurrencyRepository } from "../repositories/CurrencyRepository";
 
 const router = Router();
+
 router.get("/test", (req, res) => {
   res.status(200).send("Test route is working!");
 });
@@ -30,7 +31,8 @@ router.get("/", async (req, res) => {
     res.status(500).send("Error fetching crypto data.");
   }
 });
-router.get("/prices/:cryptoId", async (req, res) => {
+
+router.get("/prices/:cryptoId", async (req: Request, res: Response) => {
   const { cryptoId } = req.params;
 
   try {
@@ -44,6 +46,7 @@ router.get("/prices/:cryptoId", async (req, res) => {
     res.status(500).json({ error: "Unable to fetch prices" });
   }
 });
+
 router.get("/most-recent", async (req, res) => {
   try {
     const currencyRepository = new CurrencyRepository();
@@ -54,6 +57,7 @@ router.get("/most-recent", async (req, res) => {
     res.status(500).json({ error: "Unable to fetch most recent crypto data." });
   }
 });
+
 router.get("/crypto-prices", async (req, res) => {
   try {
     const currencyRepository = new CurrencyRepository();
@@ -64,7 +68,8 @@ router.get("/crypto-prices", async (req, res) => {
     res.status(500).json({ message: "Error fetching crypto prices" });
   }
 });
-router.get("/historical-data", async (req, res) => {
+
+router.get("/historical-data", async (req: Request, res: Response) => {
   const { currencyName, period } = req.query;
 
   if (!currencyName || !period) {
@@ -82,6 +87,46 @@ router.get("/historical-data", async (req, res) => {
   } catch (error) {
     console.error("Error displaying historical crypto data:", error);
     res.status(500).send("Error displaying historical crypto data.");
+  }
+});
+router.post("/forecast", async (req: Request, res: Response) => {
+  try {
+    const { currencyName } = req.body;
+
+    if (!currencyName) {
+      return res
+        .status(400)
+        .json({ error: "Missing required parameter: currencyName." });
+    }
+
+    const method = "sma";
+    const period = 7;
+
+    const forecastResult = await forecastCryptoPrices(
+      currencyName,
+      method,
+      period
+    );
+
+    if (!forecastResult) {
+      return res.status(404).json({ error: "Forecast result not found." });
+    }
+
+    const forecastedValues = forecastResult.forecastedValues.map((entry) => ({
+      date: entry.date,
+      price: entry.price,
+    }));
+
+    res.json({
+      forecastedValues,
+    });
+
+    console.log("Forecast result:", { forecastedValues });
+  } catch (error) {
+    console.error("Error forecasting crypto prices:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to generate forecast. Please try again later." });
   }
 });
 

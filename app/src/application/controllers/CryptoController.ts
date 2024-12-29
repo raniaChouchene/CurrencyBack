@@ -79,3 +79,92 @@ export const displayHistoricalCryptoData = async (
 };
 
 cron.schedule("* * * * *", saveCryptoDataToDB);
+export const forecastCryptoPrices = async (
+  currencyName: string,
+  method: string,
+  period: number
+) => {
+  try {
+    const currencyRepository = new CurrencyRepository();
+    const allData = await currencyRepository.getAllCryptoData();
+    const cryptoData = allData.filter((crypto) => crypto.name === currencyName);
+
+    if (cryptoData.length === 0) {
+      throw new Error(`No data found for ${currencyName}`);
+    }
+
+    const sortedData = cryptoData.sort((a, b) => {
+      const dateA = new Date(a.timestamp);
+      const dateB = new Date(b.timestamp);
+      return dateA.getTime() - dateB.getTime();
+    });
+
+    const historicalPrices = sortedData.map((entry) => parseFloat(entry.price));
+    const historicalTimestamps = sortedData.map((entry) => entry.timestamp);
+
+    let forecastedValues: { date: string; price: number }[];
+    if (method === "sma") {
+      const forecastedPrices = simpleMovingAverage(historicalPrices, period);
+      forecastedValues = generateForecastTimestamps(
+        historicalTimestamps,
+        forecastedPrices
+      );
+    } else if (method === "exponential") {
+      const forecastedPrices = exponentialSmoothing(historicalPrices, 0.5);
+      forecastedValues = generateForecastTimestamps(
+        historicalTimestamps,
+        forecastedPrices
+      );
+    } else {
+      throw new Error("Invalid forecast method. Use 'sma' or 'exponential'.");
+    }
+
+    return {
+      historicalData: sortedData.map((entry) => ({
+        date: entry.timestamp,
+        price: parseFloat(entry.price),
+      })),
+      forecastedValues,
+    };
+  } catch (error) {
+    console.error("Error forecasting crypto prices:", error);
+    throw error;
+  }
+};
+
+function simpleMovingAverage(data: number[], windowSize: number) {
+  const result: number[] = [];
+  for (let i = 0; i <= data.length - windowSize; i++) {
+    const window = data.slice(i, i + windowSize);
+    const avg = window.reduce((sum, val) => sum + val, 0) / windowSize;
+    result.push(avg);
+  }
+  return result;
+}
+
+function exponentialSmoothing(data: number[], alpha: number) {
+  let result: number[] = [data[0]];
+  for (let i = 1; i < data.length; i++) {
+    result.push(alpha * data[i] + (1 - alpha) * result[i - 1]);
+  }
+  return result;
+}
+
+function generateForecastTimestamps(
+  historicalTimestamps: string[],
+  forecastedPrices: number[]
+) {
+  const lastTimestamp = new Date(
+    historicalTimestamps[historicalTimestamps.length - 1]
+  );
+
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  return forecastedPrices.slice(0, 30).map((price, index) => {
+    const newDate = new Date(lastTimestamp.getTime() + (index + 1) * oneDay);
+    return {
+      date: newDate.toISOString().split("T")[0],
+      price,
+    };
+  });
+}
