@@ -11,18 +11,40 @@ const router = Router();
 const userRepository = new UserRepository();
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const userController = new UserController(createUserUseCase);
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users
+ */
 router.get("/test", (req, res) => {
   res.status(200).send("Test route is working!");
 });
 
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users
+ */
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
   userController.index
 );
-
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Login
+ */
 router.post("/login", generateJWT);
-
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: Register
+ */
 router.post("/register", CreateUserValidator, userController.create);
 
 export { router as userRouter };
