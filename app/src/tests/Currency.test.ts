@@ -9,18 +9,15 @@ import {
 } from "@jest/globals";
 import Crypto from "../domain/entities/Crypto/Crypto";
 import { CurrencyRepository } from "../infra/repositories/CurrencyRepository";
-import { afterEach } from "node:test";
 
 jest.setTimeout(60000);
-jest.mock("../infra/repositories/CurrencyRepository");
 jest.mock("../domain/entities/Crypto/Crypto");
 
 describe("CurrencyRepository", () => {
-  let currencyRepository: jest.Mocked<CurrencyRepository>;
+  let currencyRepository: CurrencyRepository;
 
   beforeEach(() => {
-    currencyRepository =
-      new CurrencyRepository() as jest.Mocked<CurrencyRepository>;
+    currencyRepository = new CurrencyRepository();
   });
 
   describe("saveCryptoData", () => {
@@ -56,8 +53,7 @@ describe("CurrencyRepository", () => {
       ];
 
       validateData(data);
-
-      currencyRepository.saveCryptoData.mockResolvedValueOnce();
+      jest.spyOn(currencyRepository, "saveCryptoData").mockResolvedValueOnce();
 
       await currencyRepository.saveCryptoData(data);
 
@@ -97,7 +93,9 @@ describe("CurrencyRepository", () => {
       ];
 
       validateData(data);
-      currencyRepository.saveCryptoData.mockResolvedValueOnce(undefined);
+      jest
+        .spyOn(currencyRepository, "saveCryptoData")
+        .mockResolvedValueOnce(undefined);
 
       await currencyRepository.saveCryptoData(data);
 
@@ -127,6 +125,69 @@ describe("CurrencyRepository", () => {
         console.log({ loggedError: error.message });
         expect(error.message).toMatch(/Invalid data/);
       }
+    });
+  });
+  describe("getMostRecentPrices", () => {
+    it("should return the most recent crypto prices", async () => {
+      const mockData = [
+        {
+          id: "crypto1",
+          name: "Bitcoin",
+          price: 50000,
+          volume: 1200,
+          marketCap: 900000,
+          timestamp: new Date(),
+        },
+      ];
+
+      jest.spyOn(Crypto, "aggregate").mockResolvedValueOnce(mockData);
+
+      const result = await currencyRepository.getMostRecentPrices();
+
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe("Bitcoin");
+      expect(result[0].price).toBe(50000);
+      expect(result[0].timestamp).toBeDefined();
+    });
+  });
+
+  describe("getLast30CryptoPrices", () => {
+    it("should return the last 30 crypto prices", async () => {
+      const mockData = [
+        {
+          name: "Bitcoin",
+          data: [
+            { timestamp: new Date(), value: 50000 },
+            { timestamp: new Date(), value: 52000 },
+            { timestamp: new Date(), value: 51000 },
+          ],
+        },
+      ];
+
+      jest.spyOn(Crypto, "aggregate").mockResolvedValueOnce(mockData);
+
+      const result = await currencyRepository.getLast30CryptoPrices();
+
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe("Bitcoin");
+      expect(result[0].data.length).toBe(3);
+      expect(result[0].data[0].value).toBe(51000);
+    });
+
+    it("should handle errors when fetching the last 30 crypto prices", async () => {
+      jest.spyOn(Crypto, "aggregate");
+    });
+
+    it("should return an empty array if no data is found", async () => {
+      jest.spyOn(Crypto, "aggregate").mockResolvedValueOnce([]);
+
+      const result = await currencyRepository.getLast30CryptoPrices();
+      expect(result).toEqual([]);
+    });
+
+    it("should throw an error for invalid data format", async () => {
+      const invalidData = [{ name: "Bitcoin", data: undefined }];
+      jest.spyOn(Crypto, "aggregate").mockResolvedValueOnce(invalidData);
     });
   });
 });
