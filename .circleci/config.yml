@@ -24,7 +24,7 @@ jobs:
       - run:
           name: Upload coverage to Codecov
           command: |
-      bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -C $CIRCLE_SHA1
+            bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -C $CIRCLE_SHA1
 
       - run:
           name: List project files
