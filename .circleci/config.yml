@@ -1,30 +1,38 @@
 version: 2.1
-orbs:
-  codecov: codecov/codecov@4.0.1
 
 jobs:
   build-and-test:
     docker:
-      - image: cimg/openjdk:20.0
+      - image: cimg/node:18.0 # Use the appropriate Node.js version
+    working_directory: ~/project
     steps:
       - checkout
 
+      # Install Node.js dependencies
       - run:
-          name: Unit tests with Jacoco
-          command: mvn test jacoco:report
+          name: Install dependencies
+          command: npm install
 
+      # Run unit tests and generate coverage
       - run:
-          name: Checkstyle Analysis
-          command: mvn checkstyle:checkstyle
+          name: Run tests with coverage
+          command: npm test -- --coverage
 
+      # Run lint checks (e.g., ESLint)
       - run:
-          name: Install Codecov
+          name: Lint code
+          command: npm run lint
+
+      # Install and upload to Codecov
+      - run:
+          name: Upload coverage to Codecov
           command: |
             bash <(curl -s https://codecov.io/bash)
 
+      # Debugging step to list project files
       - run:
-          name: List target directory
-          command: ls -R ./target
+          name: List project files
+          command: ls -R .
 
 workflows:
   version: 2
@@ -34,4 +42,4 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - main # Adjust this if you want to build other branches
