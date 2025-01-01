@@ -71,6 +71,8 @@
     "yarn": "^1.22.22"
   },
   "jest": {
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
     "moduleNameMapper": {
       "^~/(.*)$": "<rootDir>/src/$1"
     },
