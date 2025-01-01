@@ -59,14 +59,9 @@ router.get("/most-recent", async (req, res) => {
 });
 
 router.get("/crypto-prices", async (req, res) => {
-  try {
-    const currencyRepository = new CurrencyRepository();
-    const data = await currencyRepository.getLast30CryptoPrices();
-    res.json(data);
-  } catch (error) {
-    console.error("Error fetching crypto prices:", error);
-    res.status(500).json({ message: "Error fetching crypto prices" });
-  }
+  const currencyRepository = new CurrencyRepository();
+  const data = await currencyRepository.getLast30CryptoPrices();
+  res.json(data);
 });
 
 router.get("/historical-data", async (req: Request, res: Response) => {
@@ -78,56 +73,44 @@ router.get("/historical-data", async (req: Request, res: Response) => {
       .json({ error: "currencyName and period are required." });
   }
 
-  try {
-    const data = await displayHistoricalCryptoData(
-      currencyName as string,
-      period as string
-    );
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error displaying historical crypto data:", error);
-    res.status(500).send("Error displaying historical crypto data.");
-  }
+  const data = await displayHistoricalCryptoData(
+    currencyName as string,
+    period as string
+  );
+  res.status(200).json(data);
 });
 router.post("/forecast", async (req: Request, res: Response) => {
-  try {
-    const { currencyName } = req.body;
+  const { currencyName } = req.body;
 
-    if (!currencyName) {
-      return res
-        .status(400)
-        .json({ error: "Missing required parameter: currencyName." });
-    }
-
-    const method = "sma";
-    const period = 7;
-
-    const forecastResult = await forecastCryptoPrices(
-      currencyName,
-      method,
-      period
-    );
-
-    if (!forecastResult) {
-      return res.status(404).json({ error: "Forecast result not found." });
-    }
-
-    const forecastedValues = forecastResult.forecastedValues.map((entry) => ({
-      date: entry.date,
-      price: entry.price,
-    }));
-
-    res.json({
-      forecastedValues,
-    });
-
-    console.log("Forecast result:", { forecastedValues });
-  } catch (error) {
-    console.error("Error forecasting crypto prices:", error.message);
-    res
-      .status(500)
-      .json({ error: "Failed to generate forecast. Please try again later." });
+  if (!currencyName) {
+    return res
+      .status(400)
+      .json({ error: "Missing required parameter: currencyName." });
   }
+
+  const method = "sma";
+  const period = 7;
+
+  const forecastResult = await forecastCryptoPrices(
+    currencyName,
+    method,
+    period
+  );
+
+  if (!forecastResult) {
+    return res.status(404).json({ error: "Forecast result not found." });
+  }
+
+  const forecastedValues = forecastResult.forecastedValues.map((entry) => ({
+    date: entry.date,
+    price: entry.price,
+  }));
+
+  res.json({
+    forecastedValues,
+  });
+
+  console.log("Forecast result:", { forecastedValues });
 });
 
 export { router as currencyRouter };
