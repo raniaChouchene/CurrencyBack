@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: cimg/node:18.0 
+      - image: cimg/node:18.0
 
     working_directory: ~/project
     steps:
@@ -12,8 +12,8 @@ jobs:
       - run:
           name: Install dependencies
           command: npm install
-      
-       - run:
+
+      - run:
           name: Run Tests
           command: npm test
 
@@ -21,12 +21,10 @@ jobs:
           name: Lint code
           command: npm run lint
 
-
       - run:
           name: Upload coverage to Codecov
           command: |
             bash <(curl -s https://codecov.io/bash)
-
 
       - run:
           name: List project files
@@ -40,4 +38,4 @@ workflows:
           filters:
             branches:
               only:
-                - main 
+                - main
