@@ -9,6 +9,8 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
+  "files": ["app/src/**/*.ts"],
+  "ignores": ["dist", "node_modules"],
   "plugins": ["@typescript-eslint"],
   "rules": {
     "quotes": [2, "double", { "avoidEscape": true }],

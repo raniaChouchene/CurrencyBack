@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --transpile-only --ignore-watch node_modules --respawn app/src/infra/express/server.ts",
     "build": "rimraf dist && babel app/src --extensions \".ts,.js\" --out-dir dist --copy-files --no-copy-ignored",
-    "lint": "eslint app/src/**/*.ts --fix",
+    "lint": "eslint --fix",
     "start": "node -r 'dotenv/config' dist/infra/express/server.js",
     "refresh": "rimraf node_modules && yarn install",
     "test": "jest",
@@ -37,6 +37,7 @@
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-typescript": "^7.14.5",
+    "@eslint/js": "^9.17.0",
     "@types/bcrypt": "^5.0.0",
     "@types/chai": "^4.2.19",
     "@types/cookie-parser": "^1.4.2",
@@ -53,9 +54,7 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "chai": "^4.3.4",
     "coveralls": "^3.1.1",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-import-resolver-typescript": "^2.4.0",
-    "eslint-plugin-import": "^2.23.4",
+    "eslint": "^9.17.0",
     "factory-girl": "^5.0.4",
     "faker": "^5.5.3",
     "globals": "^15.14.0",
@@ -67,7 +66,8 @@
     "ts-jest": "^29.2.5",
     "ts-node-dev": "^1.1.6",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.3.4",
+    "typescript": "^4.9.5",
+    "typescript-eslint": "^8.19.0",
     "yarn": "^1.22.22"
   },
   "jest": {

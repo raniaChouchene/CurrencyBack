@@ -53,7 +53,7 @@ export const displayHistoricalCryptoData = async (
     }
 
     const currentDate = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
     if (period === "month") {
       startDate.setMonth(currentDate.getMonth() - 1);
     } else if (period === "week") {
@@ -143,7 +143,7 @@ function simpleMovingAverage(data: number[], windowSize: number) {
 }
 
 function exponentialSmoothing(data: number[], alpha: number) {
-  let result: number[] = [data[0]];
+  const result: number[] = [data[0]];
   for (let i = 1; i < data.length; i++) {
     result.push(alpha * data[i] + (1 - alpha) * result[i - 1]);
   }

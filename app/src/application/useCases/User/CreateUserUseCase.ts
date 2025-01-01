@@ -1,6 +1,6 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-empty-function */
-/* eslint-disable no-useless-constructor */
+ 
+ 
+ 
 import { IUserRepository } from "~/application/repositories/IUserRepository";
 import { IUser } from "~/domain/entities/User/IUser";
 import { IUserCreateData } from "~/domain/entities/User/IUserCreateData";

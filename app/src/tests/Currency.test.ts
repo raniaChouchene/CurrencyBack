@@ -23,10 +23,6 @@ describe("CurrencyRepository", () => {
       new CurrencyRepository() as jest.Mocked<CurrencyRepository>;
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe("saveCryptoData", () => {
     const validateData = (data: any[]) => {
       data.forEach((crypto) => {
