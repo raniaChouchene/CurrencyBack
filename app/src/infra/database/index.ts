@@ -5,7 +5,7 @@ import { DATABASE_URL } from "~/infra/constants/env";
 function connectToDatabase() {
   mongoose.connect(DATABASE_URL, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   });
   mongoose.set("useFindAndModify", true);
 

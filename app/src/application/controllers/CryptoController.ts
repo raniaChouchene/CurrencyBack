@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CurrencyRepository } from "~/infra/repositories/CurrencyRepository";
+import { CurrencyRepository } from "../../infra/repositories/CurrencyRepository";
 import cron from "node-cron";
 
 export const getCryptoData = async () => {

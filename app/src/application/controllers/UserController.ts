@@ -4,11 +4,11 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "~/domain/entities/User/User";
+import User from "../../domain/entities/User/User";
 import "dotenv/config";
-import { SECRET_KEY } from "~/infra/constants/env";
-import { IUser } from "~/domain/entities/User/IUser";
-import { ICreateUserUseCase } from "~/domain/useCases/User/ICreateUserUseCase";
+import { SECRET_KEY } from "../../infra/constants/env";
+import { IUser } from "../../domain/entities/User/IUser";
+import { ICreateUserUseCase } from "../../domain/useCases/User/ICreateUserUseCase";
 
 export interface IIndexUserRequest extends Request {
   user?: IUser;
@@ -29,7 +29,7 @@ class UserController {
     userData.password = passwordHash;
 
     const userAlreadyExists = await User.findOne({
-      username: userData.username
+      username: userData.username,
     });
 
     if (userAlreadyExists) {

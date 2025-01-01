@@ -1,5 +1,5 @@
-import Crypto from "~/domain/entities/Crypto/Crypto";
-import Alert from "~/domain/entities/Crypto/Alert";
+import Crypto from "../../domain/entities/Crypto/Crypto";
+
 const jwt = require("jsonwebtoken");
 
 export const handleSetAlert = async (req, res) => {

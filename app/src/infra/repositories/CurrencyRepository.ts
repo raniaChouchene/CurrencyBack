@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { IcurrencyRepository } from "~/application/repositories/ICurrencyRepository";
-import Crypto from "~/domain/entities/Crypto/Crypto";
+import { IcurrencyRepository } from "../../application/repositories/ICurrencyRepository";
+import Crypto from "../../domain/entities/Crypto/Crypto";
 
 class CurrencyRepository implements IcurrencyRepository {
   async getAllCryptoData() {
@@ -13,20 +13,15 @@ class CurrencyRepository implements IcurrencyRepository {
   }
 
   async saveCryptoData(data: any) {
-    try {
-      for (const item of data) {
-        const crypto = new Crypto({
-          id: item.id,
-          name: item.name,
-          price: parseFloat(item.priceUsd),
-          volume: parseFloat(item.volumeUsd24Hr),
-          marketCap: parseFloat(item.marketCapUsd),
-        });
-        await crypto.save();
-      }
-    } catch (error) {
-      console.error("Error saving crypto data to DB:", error);
-      throw error;
+    for (const item of data) {
+      const crypto = new Crypto({
+        id: item.id,
+        name: item.name,
+        price: parseFloat(item.priceUsd),
+        volume: parseFloat(item.volumeUsd24Hr),
+        marketCap: parseFloat(item.marketCapUsd),
+      });
+      await crypto.save();
     }
   }
 

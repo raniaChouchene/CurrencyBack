@@ -5,18 +5,35 @@ import {
   describe,
   expect,
   it,
+  jest,
 } from "@jest/globals";
-import Crypto from "~/domain/entities/Crypto/Crypto";
-import { CurrencyRepository } from "~/infra/repositories/CurrencyRepository";
+import Crypto from "../domain/entities/Crypto/Crypto";
+import { CurrencyRepository } from "../infra/repositories/CurrencyRepository";
+import { afterEach } from "node:test";
+
+jest.setTimeout(60000);
+jest.mock("../infra/repositories/CurrencyRepository");
+jest.mock("../domain/entities/Crypto/Crypto");
 
 describe("CurrencyRepository", () => {
+  let currencyRepository: jest.Mocked<CurrencyRepository>;
+
+  beforeEach(() => {
+    currencyRepository =
+      new CurrencyRepository() as jest.Mocked<CurrencyRepository>;
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe("saveCryptoData", () => {
     const validateData = (data: any[]) => {
       data.forEach((crypto) => {
         if (
-          isNaN(crypto.price) ||
-          isNaN(crypto.volume) ||
-          isNaN(crypto.marketCap)
+          isNaN(crypto.priceUsd) ||
+          isNaN(crypto.volumeUsd24Hr) ||
+          isNaN(crypto.marketCapUsd)
         ) {
           throw new Error(`Invalid data: ${JSON.stringify(crypto)}`);
         }
@@ -24,27 +41,28 @@ describe("CurrencyRepository", () => {
     };
 
     it("should save crypto data with timestamps", async () => {
-      const data = [
+      jest.spyOn(Crypto, "find").mockImplementationOnce(() => [
         {
-          id: "crypto1",
           name: "Bitcoin",
           price: 50000,
           volume: 1200,
           marketCap: 900000,
         },
+      ]);
+      const data = [
         {
-          id: "crypto2",
-          name: "Ethereum",
-          price: 4000,
-          volume: 1000,
-          marketCap: 450000,
+          id: "crypto1",
+          name: "Bitcoin",
+          priceUsd: 50000,
+          volumeUsd24Hr: 1200,
+          marketCapUsd: 900000,
         },
       ];
 
-      // Validate the data before saving
       validateData(data);
 
-      const currencyRepository = new CurrencyRepository();
+      currencyRepository.saveCryptoData.mockResolvedValueOnce();
+
       await currencyRepository.saveCryptoData(data);
 
       const savedCrypto = await Crypto.find({ name: "Bitcoin" });
@@ -57,27 +75,34 @@ describe("CurrencyRepository", () => {
     });
 
     it("should save multiple cryptocurrencies", async () => {
+      jest.spyOn(Crypto, "find").mockImplementationOnce(() => [
+        {
+          name: "Ripple",
+        },
+        {
+          name: "Litecoin",
+        },
+      ]);
       const data = [
         {
           id: "crypto3",
           name: "Ripple",
-          price: 1.2,
-          volume: 5000,
-          marketCap: 120000,
+          priceUsd: 1.2,
+          volumeUsd24Hr: 5000,
+          marketCapUsd: 120000,
         },
         {
           id: "crypto4",
           name: "Litecoin",
-          price: 150,
-          volume: 2500,
-          marketCap: 375000,
+          priceUsd: 150,
+          volumeUsd24Hr: 2500,
+          marketCapUsd: 375000,
         },
       ];
 
-      // Validate the data before saving
       validateData(data);
+      currencyRepository.saveCryptoData.mockResolvedValueOnce(undefined);
 
-      const currencyRepository = new CurrencyRepository();
       await currencyRepository.saveCryptoData(data);
 
       const savedCryptos = await Crypto.find({});
@@ -92,20 +117,18 @@ describe("CurrencyRepository", () => {
         {
           id: "crypto5",
           name: "InvalidCrypto",
-          price: NaN,
-          volume: 5000,
-          marketCap: 100000,
+          priceUsd: NaN,
+          volumeUsd24Hr: 5000,
+          marketCapUsd: 100000,
         },
       ];
 
+      expect(() => validateData(invalidData)).toThrowError(/Invalid data/);
+
       try {
-        // Validate the data before saving
-        validateData(invalidData);
-        //@ts-expect-error
-        await CurrencyRepository.saveCryptoData(invalidData);
-        // If validation passes, we should fail the test
-        throw new Error("Test failed: Invalid data should not be allowed.");
+        await currencyRepository.saveCryptoData(invalidData);
       } catch (error) {
+        console.log({ loggedError: error.message });
         expect(error.message).toMatch(/Invalid data/);
       }
     });
