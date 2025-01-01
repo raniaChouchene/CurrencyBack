@@ -1,0 +1,37 @@
+version: 2.1
+orbs:
+  codecov: codecov/codecov@4.0.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/openjdk:20.0
+    steps:
+      - checkout
+
+      - run:
+          name: Unit tests with Jacoco
+          command: mvn test jacoco:report
+
+      - run:
+          name: Checkstyle Analysis
+          command: mvn checkstyle:checkstyle
+
+      - run:
+          name: Install Codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash)
+
+      - run:
+          name: List target directory
+          command: ls -R ./target
+
+workflows:
+  version: 2
+  sample-workflow:
+    jobs:
+      - build-and-test:
+          filters:
+            branches:
+              only:
+                - main
