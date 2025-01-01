@@ -16,6 +16,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["app/src/**/*", "app/tests/**/*"],
+  "include": [
+    "app/src/**/*",
+    "app/tests/**/*",
+    "app/src/tests/currencyRouter.test.ts"
+  ],
   "exclude": ["./node_modules/", "./dist/"]
 }

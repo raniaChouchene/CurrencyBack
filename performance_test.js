@@ -10,14 +10,15 @@ export default function () {
 
   const postData = { currencyName: "bitcoin" };
   const postRes = http.post(
-    "http://localhost:3000/api/forecast",
+    "http://localhost:3000/cryptocurrencies/forecast",
     JSON.stringify(postData),
     {
       headers: { "Content-Type": "application/json" },
     }
   );
   check(postRes, {
-    "POST /api/forecast returns status 200": (r) => r.status === 200,
+    "POST /cryptocurrencies/forecast returns status 200": (r) =>
+      r.status === 200,
   });
 
   sleep(1);
