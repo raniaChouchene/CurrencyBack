@@ -1,6 +1,3 @@
- 
- 
- 
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -16,6 +13,21 @@ export interface IIndexUserRequest extends Request {
 
 class UserController {
   constructor(private readonly createUserUseCase: ICreateUserUseCase) {}
+  static async getUserByEmail(userId: string): Promise<string | null> {
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        console.error("User not found for ID:", userId);
+        return null;
+      }
+
+      return user.username;
+    } catch (error) {
+      console.error("Error fetching user by ID:", error);
+      return null;
+    }
+  }
 
   create = async (req: Request, res: Response): Promise<Response> => {
     const userData = req.body;

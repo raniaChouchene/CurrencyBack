@@ -30,6 +30,26 @@ export const saveCryptoDataToDB = async () => {
     throw error;
   }
 };
+export const getCryptoByName = async (cryptoName: string) => {
+  try {
+    if (!cryptoName) {
+      throw new Error("Cryptocurrency name is required");
+    }
+
+    const currencyRepository = new CurrencyRepository();
+    const cryptoData = await currencyRepository.getCryptoByName(cryptoName);
+
+    if (!cryptoData) {
+      throw new Error(`No data found for cryptocurrency: ${cryptoName}`);
+    }
+
+    return cryptoData;
+  } catch (error) {
+    console.error("Error fetching cryptocurrency by name:", error);
+    throw error;
+  }
+};
+
 export const getMostRecentCryptoPrices = async () => {
   try {
     const currencyRepository = new CurrencyRepository();

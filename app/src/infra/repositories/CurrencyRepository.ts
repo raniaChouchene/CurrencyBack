@@ -12,6 +12,16 @@ class CurrencyRepository implements IcurrencyRepository {
     }
   }
 
+  public async getCryptoByName(cryptoName: string): Promise<any> {
+    try {
+      const cryptoData = await Crypto.findOne({ name: cryptoName });
+      return cryptoData;
+    } catch (error) {
+      console.error("Error fetching crypto data by name:", error);
+      throw error;
+    }
+  }
+
   async saveCryptoData(data: any) {
     for (const item of data) {
       const crypto = new Crypto({
