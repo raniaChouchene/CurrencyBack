@@ -1,4 +1,5 @@
-import Crypto from "../../domain/entities/Crypto/Crypto";
+import Crypto from "~/domain/entities/Crypto/Crypto";
+import Alert from "~/domain/entities/Crypto/Alert";
 
 const jwt = require("jsonwebtoken");
 

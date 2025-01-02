@@ -27,9 +27,8 @@ router.use("/cryptocurrencies", currencyRouter);
  * /alert:
  *   post:
  *     summary: Create a new alert
- *  /
+ *
  */
 router.use("/alert", alertRouter);
-// router.use(passport.authenticate("jwt", { session: true }));
 
 export { router };
