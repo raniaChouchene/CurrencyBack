@@ -114,6 +114,8 @@ router.get("/historical-data", async (req: Request, res: Response) => {
     currencyName as string,
     period as string
   );
+  console.log("Period:", period);
+  console.log("Historical data:", data);
   res.status(200).json(data);
 });
 /**

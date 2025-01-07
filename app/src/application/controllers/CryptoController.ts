@@ -66,26 +66,44 @@ export const displayHistoricalCryptoData = async (
 ) => {
   try {
     const currencyRepository = new CurrencyRepository();
-    const allData = await currencyRepository.getAllCryptoData();
 
     if (period !== "month" && period !== "week") {
       throw new Error("Invalid period. Please specify 'month' or 'week'.");
     }
 
-    const currentDate = new Date();
     const startDate = new Date();
+
     if (period === "month") {
-      startDate.setMonth(currentDate.getMonth() - 1);
+      startDate.setDate(startDate.getDate() - 30);
+      startDate.setHours(0, 0, 0, 0);
     } else if (period === "week") {
-      startDate.setDate(currentDate.getDate() - 7);
+      startDate.setDate(startDate.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
     }
 
-    const filteredData = allData.filter((crypto) => {
+    // const filteredData = allData.filter((crypto) => {
+    //   const timestamp = new Date(crypto.timestamp);
+    //   timestamp.setHours(0, 0, 0, 0);
+    //   return crypto.name === currencyName && timestamp >= startDate;
+    // });
+
+    const filteredData = await currencyRepository.getAllCryptoDataFromDate(
+      startDate,
+      currencyName
+    );
+
+    const dailyMap = new Map<string, any>();
+    filteredData.forEach((crypto) => {
       const timestamp = new Date(crypto.timestamp);
-      return crypto.name === currencyName && timestamp >= startDate;
+      const key = `${timestamp.getFullYear()}${timestamp.getMonth()}${timestamp.getDate()}`;
+      if (!dailyMap.has(key)) {
+        dailyMap.set(key, crypto);
+      }
     });
 
-    const sortedData = filteredData.sort((a, b) => {
+    const finalArray = Array.from(dailyMap.values());
+
+    const sortedData = finalArray.sort((a, b) => {
       const dateA = new Date(a.timestamp);
       const dateB = new Date(b.timestamp);
       return dateB.getTime() - dateA.getTime();

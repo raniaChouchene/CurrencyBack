@@ -12,6 +12,15 @@ class CurrencyRepository implements IcurrencyRepository {
     }
   }
 
+  async getAllCryptoDataFromDate(date: Date, name: string) {
+    try {
+      return await Crypto.find({ timestamp: { $gte: date }, name: name });
+    } catch (error) {
+      console.error("Error fetching data from DB:", error);
+      throw error;
+    }
+  }
+
   public async getCryptoByName(cryptoName: string): Promise<any> {
     try {
       const cryptoData = await Crypto.findOne({ name: cryptoName });
