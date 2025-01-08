@@ -10,6 +10,7 @@ const router = Router();
 
 const userRepository = new UserRepository();
 const createUserUseCase = new CreateUserUseCase(userRepository);
+//@ts-expect-error
 const userController = new UserController(createUserUseCase);
 /**
  * @swagger

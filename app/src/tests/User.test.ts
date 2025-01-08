@@ -43,6 +43,7 @@ describe("UserController", () => {
   });
 
   beforeEach(() => {
+    //@ts-expect-error
     mockCreateUserUseCase = {
       create: jest.fn(),
     } as jest.Mocked<ICreateUserUseCase>;

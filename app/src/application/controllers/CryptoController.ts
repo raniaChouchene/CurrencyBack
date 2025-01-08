@@ -81,12 +81,6 @@ export const displayHistoricalCryptoData = async (
       startDate.setHours(0, 0, 0, 0);
     }
 
-    // const filteredData = allData.filter((crypto) => {
-    //   const timestamp = new Date(crypto.timestamp);
-    //   timestamp.setHours(0, 0, 0, 0);
-    //   return crypto.name === currencyName && timestamp >= startDate;
-    // });
-
     const filteredData = await currencyRepository.getAllCryptoDataFromDate(
       startDate,
       currencyName

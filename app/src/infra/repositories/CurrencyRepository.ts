@@ -36,6 +36,7 @@ class CurrencyRepository implements IcurrencyRepository {
       const crypto = new Crypto({
         id: item.id,
         name: item.name,
+        symbol: item.symbol,
         price: parseFloat(item.priceUsd),
         volume: parseFloat(item.volumeUsd24Hr),
         marketCap: parseFloat(item.marketCapUsd),
@@ -54,7 +55,9 @@ class CurrencyRepository implements IcurrencyRepository {
           $group: {
             _id: "$id",
             name: { $first: "$name" },
+            symbol: { $first: "$symbol" },
             price: { $first: "$price" },
+
             volume: { $first: "$volume" },
             marketCap: { $first: "$marketCap" },
             timestamp: { $first: "$timestamp" },
@@ -64,6 +67,7 @@ class CurrencyRepository implements IcurrencyRepository {
           $project: {
             _id: 0,
             id: "$_id",
+            symbol: 1,
             name: 1,
             price: 1,
             volume: 1,
