@@ -34,10 +34,7 @@ describe("CurrencyRepository", () => {
     };
 
     it("should save crypto data with timestamps", async () => {
-      // Mock the `create` method to simulate saving a cryptocurrency
       jest.spyOn(Crypto, "create");
-
-      // Mock the `find` method to simulate retrieving saved cryptocurrency data
       jest.spyOn(Crypto, "find").mockResolvedValueOnce([
         {
           name: "Bitcoin",
@@ -57,21 +54,15 @@ describe("CurrencyRepository", () => {
         },
       ];
 
-      // Validate the input data
       validateData(data);
-
-      // Call the method under test
       await currencyRepository.saveCryptoData(data);
-
-      // Retrieve saved cryptocurrency data
       const savedCrypto = await Crypto.find({ name: "Bitcoin" });
 
-      // Assertions
-      expect(savedCrypto).toBeDefined(); // Ensure data is retrieved
-      expect(savedCrypto.length).toBeGreaterThan(0); // Ensure non-empty array
-      expect(savedCrypto[0].price).toBe(50000); // Check saved price
-      expect(savedCrypto[0].volume).toBe(1200); // Check saved volume
-      expect(savedCrypto[0].marketCap).toBe(900000); // Check saved market cap
+      expect(savedCrypto).toBeDefined();
+      expect(savedCrypto.length).toBeGreaterThan(0);
+      expect(savedCrypto[0].price).toBe(50000);
+      expect(savedCrypto[0].volume).toBe(1200);
+      expect(savedCrypto[0].marketCap).toBe(900000);
     });
 
     it("should save multiple cryptocurrencies", async () => {
