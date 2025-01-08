@@ -121,4 +121,4 @@ class CurrencyRepository implements IcurrencyRepository {
   }
 }
 
-export { CurrencyRepository };
+export default CurrencyRepository;

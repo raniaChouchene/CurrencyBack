@@ -5,7 +5,7 @@ import {
   saveCryptoDataToDB,
 } from "~/application/controllers/CryptoController";
 import Crypto from "~/domain/entities/Crypto/Crypto";
-import { CurrencyRepository } from "../repositories/CurrencyRepository";
+import CurrencyRepository from "../repositories/CurrencyRepository";
 
 const router = Router();
 
