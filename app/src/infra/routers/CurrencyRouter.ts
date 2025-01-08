@@ -8,15 +8,7 @@ import Crypto from "~/domain/entities/Crypto/Crypto";
 import { CurrencyRepository } from "../repositories/CurrencyRepository";
 
 const router = Router();
-/**
- * @swagger
- * /cryptocurrencies/test:
- *   get:
- *     summary: Get all cryptocurrencies
- */
-router.get("/test", (req, res) => {
-  res.status(200).send("Test route is working!");
-});
+
 /**
  * @swagger
  * /example:
@@ -127,12 +119,6 @@ router.get("/historical-data", async (req: Request, res: Response) => {
 router.post("/forecast", async (req: Request, res: Response) => {
   const { currencyName } = req.body;
 
-  if (!currencyName) {
-    return res
-      .status(400)
-      .json({ error: "Missing required parameter: currencyName." });
-  }
-
   const method = "sma";
   const period = 7;
 
@@ -141,10 +127,6 @@ router.post("/forecast", async (req: Request, res: Response) => {
     method,
     period
   );
-
-  if (!forecastResult) {
-    return res.status(404).json({ error: "Forecast result not found." });
-  }
 
   const forecastedValues = forecastResult.forecastedValues.map((entry) => ({
     date: entry.date,

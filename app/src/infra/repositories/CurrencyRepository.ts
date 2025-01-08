@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { IcurrencyRepository } from "../../application/repositories/ICurrencyRepository";
-import Crypto from "../../domain/entities/Crypto/Crypto";
+import Crypto, { ICrypto } from "../../domain/entities/Crypto/Crypto";
 
 class CurrencyRepository implements IcurrencyRepository {
   async getAllCryptoData() {
@@ -21,7 +21,7 @@ class CurrencyRepository implements IcurrencyRepository {
     }
   }
 
-  public async getCryptoByName(cryptoName: string): Promise<any> {
+  public async getCryptoByName(cryptoName: string): Promise<ICrypto> {
     try {
       const cryptoData = await Crypto.findOne({ name: cryptoName });
       return cryptoData;

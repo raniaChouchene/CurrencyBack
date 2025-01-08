@@ -1,6 +1,7 @@
 import axios from "axios";
 import { CurrencyRepository } from "../../infra/repositories/CurrencyRepository";
 import cron from "node-cron";
+import Crypto, { ICrypto } from "~/domain/entities/Crypto/Crypto";
 
 export const getCryptoData = async () => {
   try {
@@ -30,7 +31,7 @@ export const saveCryptoDataToDB = async () => {
     throw error;
   }
 };
-export const getCryptoByName = async (cryptoName: string) => {
+export const getCryptoByName = async (cryptoName: string): Promise<ICrypto> => {
   try {
     if (!cryptoName) {
       throw new Error("Cryptocurrency name is required");
@@ -131,8 +132,10 @@ export const forecastCryptoPrices = async (
       return dateA.getTime() - dateB.getTime();
     });
 
-    const historicalPrices = sortedData.map((entry) => parseFloat(entry.price));
-    const historicalTimestamps = sortedData.map((entry) => entry.timestamp);
+    const historicalPrices = sortedData.map((entry) => entry.price);
+    const historicalTimestamps = sortedData.map((entry) =>
+      entry.timestamp.toString()
+    );
 
     let forecastedValues: { date: string; price: number }[];
     if (method === "sma") {
@@ -154,7 +157,7 @@ export const forecastCryptoPrices = async (
     return {
       historicalData: sortedData.map((entry) => ({
         date: entry.timestamp,
-        price: parseFloat(entry.price),
+        price: entry.price,
       })),
       forecastedValues,
     };

@@ -21,9 +21,7 @@ export const handleSetAlert = async (req, res) => {
     if (!cryptoId) {
       return res.status(400).json({ message: "Crypto ID is required" });
     }
-    const crypto = await Crypto.findOne({
-      name: new RegExp(`^${cryptoId}$`, "i"),
-    });
+    const crypto = await Crypto.findById(cryptoId);
     if (!crypto) {
       console.log("Crypto not found with name:", cryptoId);
       return res.status(404).json({ message: "Cryptocurrency not found" });
@@ -102,10 +100,13 @@ export const monitorAlerts = async () => {
       const currentValue = await getCryptoByName(crypto.name);
 
       if (
-        (alert.thresholdType === "above" && currentValue > alert.threshold) ||
-        (alert.thresholdType === "below" && currentValue < alert.threshold)
+        (alert.thresholdType === "above" &&
+          currentValue.price > alert.threshold) ||
+        (alert.thresholdType === "below" &&
+          currentValue.price < alert.threshold)
       ) {
         const userEmail = await UserController.getUserByEmail(alert.userId);
+        console.log(`Alert triggered for ${userEmail}`);
         await sendEmailNotification(
           userEmail,
           crypto.name,
@@ -119,9 +120,10 @@ export const monitorAlerts = async () => {
     console.error("Error monitoring alerts:", error);
   }
 };
-cron.schedule("* * * * *", async () => {
+
+/* cron.schedule("* * * * *", async () => {
   console.log("Running scheduled monitorAlerts...");
   await monitorAlerts();
-});
+}); */
 
 module.exports = { handleSetAlert, fetchAlertHistory, monitorAlerts };

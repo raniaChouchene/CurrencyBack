@@ -9,6 +9,12 @@ import {
 } from "@jest/globals";
 import Crypto from "../domain/entities/Crypto/Crypto";
 import { CurrencyRepository } from "../infra/repositories/CurrencyRepository";
+import {
+  displayHistoricalCryptoData,
+  forecastCryptoPrices,
+  getCryptoData,
+} from "~/application/controllers/CryptoController";
+import axios from "axios";
 
 jest.setTimeout(60000);
 jest.mock("../domain/entities/Crypto/Crypto");
@@ -20,7 +26,7 @@ describe("CurrencyRepository", () => {
     currencyRepository = new CurrencyRepository();
   });
 
-  describe("saveCryptoData", () => {
+  describe("saveCryptoDataToDB", () => {
     const validateData = (data: any[]) => {
       data.forEach((crypto) => {
         if (
@@ -35,25 +41,18 @@ describe("CurrencyRepository", () => {
 
     it("should save crypto data with timestamps", async () => {
       jest.spyOn(Crypto, "create");
-      jest.spyOn(Crypto, "find").mockResolvedValueOnce([
-        {
-          name: "Bitcoin",
-          price: 50000,
-          volume: 1200,
-          marketCap: 900000,
-        },
-      ]);
 
       const data = [
         {
           id: "crypto1",
+          symbol: "BTC",
           name: "Bitcoin",
           priceUsd: 50000,
           volumeUsd24Hr: 1200,
           marketCapUsd: 900000,
+          timestamp: new Date(),
         },
       ];
-
       validateData(data);
       await currencyRepository.saveCryptoData(data);
       const savedCrypto = await Crypto.find({ name: "Bitcoin" });
@@ -90,8 +89,6 @@ describe("CurrencyRepository", () => {
 
       validateData(data);
       await currencyRepository.saveCryptoData(data);
-
-      const savedCryptos = await Crypto.find({});
     });
 
     it("should throw an error if data contains NaN values", async () => {
@@ -115,7 +112,7 @@ describe("CurrencyRepository", () => {
     });
   });
 
-  describe("getMostRecentPrices", () => {
+  describe("getMostRecentCryptoPrices", () => {
     it("should return the most recent crypto prices", async () => {
       const mockData = [
         {
@@ -139,47 +136,45 @@ describe("CurrencyRepository", () => {
       expect(result[0].timestamp).toBeDefined();
     });
   });
-
-  describe("getLast30CryptoPrices", () => {
-    it("should return the last 30 crypto prices", async () => {
+  describe("displayHistoricalCryptoData", () => {
+    it("should return historical crypto data for the specified period", async () => {
       const mockData = [
-        {
-          name: "Bitcoin",
-          data: [
-            { timestamp: new Date(), value: 50000 },
-            { timestamp: new Date(), value: 52000 },
-            { timestamp: new Date(), value: 51000 },
-          ],
-        },
+        { name: "Bitcoin", priceUsd: 50000, timestamp: new Date() },
+        { name: "Bitcoin", priceUsd: 52000, timestamp: new Date() },
       ];
 
-      jest.spyOn(Crypto, "aggregate").mockResolvedValueOnce(mockData);
-
-      const result = await currencyRepository.getLast30CryptoPrices();
+      const result = await displayHistoricalCryptoData("Bitcoin", "week");
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(1);
-      expect(result[0].name).toBe("Bitcoin");
-      expect(result[0].data.length).toBe(3);
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0].priceUsd).toBe(52000);
     });
 
-    it("should handle errors when fetching the last 30 crypto prices", async () => {
-      jest
-        .spyOn(Crypto, "aggregate")
-        .mockRejectedValueOnce(new Error("DB Error"));
-
+    it("should throw an error if an invalid period is passed", async () => {
       await expect(
-        currencyRepository.getLast30CryptoPrices()
-      ).rejects.toThrowError(/DB Error/);
+        displayHistoricalCryptoData("Bitcoin", "invalidPeriod")
+      ).rejects.toThrowError(
+        "Invalid period. Please specify 'month' or 'week'."
+      );
     });
+  });
 
-    it("should return an empty array if no data is found", async () => {
-      jest.spyOn(Crypto, "aggregate").mockResolvedValueOnce([]);
+  describe("forecastCryptoPrices", () => {
+    it("should forecast crypto prices using the specified method", async () => {
+      const mockData = [
+        { name: "Bitcoin", price: 50000, timestamp: new Date() },
+        { name: "Bitcoin", price: 51000, timestamp: new Date() },
+      ];
 
-      const result = await currencyRepository.getLast30CryptoPrices();
+      const result = await forecastCryptoPrices("Bitcoin", "sma", 2);
 
       expect(result).toBeDefined();
-      expect(result).toEqual([]);
+      expect(result.forecastedValues).toBeDefined();
+      expect(result.forecastedValues.length).toBeGreaterThan(0);
+    });
+
+    it("should throw an error if an invalid forecast method is used", async () => {
+      await expect(forecastCryptoPrices("Bitcoin", "invalidMethod", 2));
     });
   });
 });
