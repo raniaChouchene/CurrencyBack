@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 import nodemailer from "nodemailer";
 import { getCryptoByName, getMostRecentCryptoPrices } from "./CryptoController";
 import { UserController } from "./UserController";
-import cron from "node-cron";
 export const handleSetAlert = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
