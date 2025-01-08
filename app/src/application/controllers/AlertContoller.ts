@@ -119,7 +119,7 @@ export const monitorAlerts = async () => {
     console.error("Error monitoring alerts:", error);
   }
 };
-cron.schedule("*/5 * * * *", async () => {
+cron.schedule("* * * * *", async () => {
   console.log("Running scheduled monitorAlerts...");
   await monitorAlerts();
 });
