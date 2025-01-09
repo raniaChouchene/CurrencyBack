@@ -27,14 +27,44 @@ jobs:
             bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -C $CIRCLE_SHA1
 
       - run:
+          name: Build Docker image
+          command: |
+            docker build -t raniaaa/currencyfront:$CIRCLE_SHA1 .
+
+      - run:
+          name: Push Docker image to Docker Hub
+          command: |
+
+            docker push raniaaa/currencyfront:$CIRCLE_SHA1
+
+      - run:
           name: List project files
           command: ls -R .
+
+  deploy-to-kubernetes:
+    docker:
+      - image: lachlanevenson/k8s-kubectl:latest
+    steps:
+      - checkout
+
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            kubectl set image deployment/frontend frontend=raniaaa/currencyfront:$CIRCLE_SHA1
+            kubectl rollout status deployment/frontend
 
 workflows:
   version: 2
   sample-workflow:
     jobs:
       - build-and-test:
+          filters:
+            branches:
+              only:
+                - main
+      - deploy-to-kubernetes:
+          requires:
+            - build-and-test
           filters:
             branches:
               only:

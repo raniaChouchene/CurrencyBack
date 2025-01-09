@@ -14,9 +14,10 @@ spec:
     spec:
       containers:
         - name: currency
-          image: Currency
+          image: raniaaa/currency:latest
           ports:
             - containerPort: 3333
+          type: NodePort
 ---
 apiVersion: v1
 kind: Service
