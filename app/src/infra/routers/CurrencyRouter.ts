@@ -96,12 +96,6 @@ router.get("/crypto-prices", async (req, res) => {
 router.get("/historical-data", async (req: Request, res: Response) => {
   const { currencyName, period } = req.query;
 
-  if (!currencyName || !period) {
-    return res
-      .status(400)
-      .json({ error: "currencyName and period are required." });
-  }
-
   const data = await displayHistoricalCryptoData(
     currencyName as string,
     period as string
