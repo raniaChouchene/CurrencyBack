@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Push Docker image to Docker Hub
           command: |
-
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker push raniaaa/currencyfront:$CIRCLE_SHA1
 
       - run:
