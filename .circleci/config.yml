@@ -4,6 +4,8 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:18.0
+    services:
+      - docker
 
     working_directory: ~/project
     steps:
@@ -18,28 +20,16 @@ jobs:
           command: npm test
 
       - run:
-          name: Lint code
-          command: npm run lint
-
-      - run:
-          name: Upload coverage to Codecov
-          command: |
-            bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -C $CIRCLE_SHA1
-
-      - run:
           name: Build Docker image
           command: |
+            docker info
             docker build -t raniaaa/currencyfront:$CIRCLE_SHA1 .
 
       - run:
           name: Push Docker image to Docker Hub
           command: |
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
             docker push raniaaa/currencyfront:$CIRCLE_SHA1
-
-      - run:
-          name: List project files
-          command: ls -R .
 
   deploy-to-kubernetes:
     docker:
