@@ -81,9 +81,21 @@ export const sendEmailNotification = async (
   currentValue
 ) => {
   const subject = `Crypto Alert: ${cryptoName}`;
-  const text = `The cryptocurrency "${cryptoName}" has ${
+  const text = `
+  Hello,
+
+  The cryptocurrency "${cryptoName}" has ${
     thresholdType === "above" ? "exceeded" : "fallen below"
-  } your threshold of ${threshold}. Current value: ${currentValue}`;
+  } .
+  
+  Current Value: $${currentValue.price}
+ 
+  
+  Please take action accordingly.
+
+  Best regards,
+  Your Crypto Alert Service
+`;
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -123,6 +135,8 @@ export const monitorAlerts = async () => {
           alert.thresholdType,
           currentValue
         );
+        await Alert.deleteOne({ _id: alert._id });
+        console.log(`Alert for ${crypto.name} deleted.`);
       }
     }
   } catch (error) {
@@ -130,9 +144,9 @@ export const monitorAlerts = async () => {
   }
 };
 
-/*cron.schedule("* * * * *", async () => {
+cron.schedule("*/2 * * * *", async () => {
   console.log("Running scheduled monitorAlerts...");
   await monitorAlerts();
-});*/
+});
 
 module.exports = { handleSetAlert, fetchAlertHistory, monitorAlerts };
