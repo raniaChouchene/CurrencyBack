@@ -5,8 +5,8 @@ jobs:
     docker:
       - image: cimg/node:18.0
         auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
 
     working_directory: ~/project
     steps:
@@ -40,25 +40,25 @@ jobs:
           name: Build Docker image
           command: |
             docker info
-            docker build -t $DOCKER_USERNAME/currencyfront:$CIRCLE_SHA1 .
+            docker build -t $DOCKER_USERNAME/currency:$CIRCLE_SHA1 .
 
       - run:
           name: Push Docker image to Docker Hub
           command: |
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker push $DOCKER_USERNAME/currencyfront:$CIRCLE_SHA1
+            docker push $DOCKER_USERNAME/currency:$CIRCLE_SHA1
 
-  deploy-to-kubernetes:
-    docker:
-      - image: lachlanevenson/k8s-kubectl:latest
-    steps:
-      - checkout
+  # deploy-to-kubernetes:
+  #   docker:
+  #     - image: lachlanevenson/k8s-kubectl:latest
+  #   steps:
+  #     - checkout
 
-      - run:
-          name: Deploy to Kubernetes
-          command: |
-            kubectl set image deployment/frontend frontend=raniaaa/currencyfront:$CIRCLE_SHA1
-            kubectl rollout status deployment/frontend
+  #     - run:
+  #         name: Deploy to Kubernetes
+  #         command: |
+  #           kubectl set image deployment/frontend frontend=$DOCKER_USERNAME/currencyfront:$CIRCLE_SHA1
+  #           kubectl rollout status deployment/frontend
 
 workflows:
   version: 2
@@ -69,10 +69,10 @@ workflows:
             branches:
               only:
                 - main
-      - deploy-to-kubernetes:
-          requires:
-            - build-and-test
-          filters:
-            branches:
-              only:
-                - main
+      # - deploy-to-kubernetes:
+      #     requires:
+      #       - build-and-test
+      #     filters:
+      #       branches:
+      #         only:
+      #           - main
