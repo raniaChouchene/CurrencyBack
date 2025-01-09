@@ -4,8 +4,6 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:18.0
-    services:
-      - docker
 
     working_directory: ~/project
     steps:
@@ -20,28 +18,41 @@ jobs:
           command: npm test
 
       - run:
-          name: Build Docker image
-          command: |
-            docker info
-            docker build -t raniaaa/currencyfront:$CIRCLE_SHA1 .
+          name: Lint code
+          command: npm run lint
 
       - run:
-          name: Push Docker image to Docker Hub
+          name: Upload coverage to Codecov
           command: |
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker push raniaaa/currencyfront:$CIRCLE_SHA1
-
-  deploy-to-kubernetes:
-    docker:
-      - image: lachlanevenson/k8s-kubectl:latest
-    steps:
-      - checkout
+            bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -C $CIRCLE_SHA1
 
       - run:
-          name: Deploy to Kubernetes
-          command: |
-            kubectl set image deployment/frontend frontend=raniaaa/currencyfront:$CIRCLE_SHA1
-            kubectl rollout status deployment/frontend
+          name: List project files
+          command: ls -R .
+
+  #     - run:
+  #         name: Build Docker image
+  #         command: |
+  #           docker info
+  #           docker build -t raniaaa/currencyfront:$CIRCLE_SHA1 .
+
+  #     - run:
+  #         name: Push Docker image to Docker Hub
+  #         command: |
+  #           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+  #           docker push raniaaa/currencyfront:$CIRCLE_SHA1
+
+  # deploy-to-kubernetes:
+  #   docker:
+  #     - image: lachlanevenson/k8s-kubectl:latest
+  #   steps:
+  #     - checkout
+
+  #     - run:
+  #         name: Deploy to Kubernetes
+  #         command: |
+  #           kubectl set image deployment/frontend frontend=raniaaa/currencyfront:$CIRCLE_SHA1
+  #           kubectl rollout status deployment/frontend
 
 workflows:
   version: 2
@@ -52,10 +63,10 @@ workflows:
             branches:
               only:
                 - main
-      - deploy-to-kubernetes:
-          requires:
-            - build-and-test
-          filters:
-            branches:
-              only:
-                - main
+      # - deploy-to-kubernetes:
+      #     requires:
+      #       - build-and-test
+      # filters:
+      #   branches:
+      #     only:
+      #       - main
