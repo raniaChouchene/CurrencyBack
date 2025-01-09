@@ -106,6 +106,7 @@ describe("CurrencyRepository", () => {
         marketCap: 1000000,
         timestamp: new Date(),
       };
+      //@ts-expect-error
 
       jest.spyOn(Crypto, "findOne").mockResolvedValue(mockData);
 

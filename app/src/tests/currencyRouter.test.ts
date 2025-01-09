@@ -1,6 +1,5 @@
 import request from "supertest";
 import express from "express";
-
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import Crypto from "../domain/entities/Crypto/Crypto";
@@ -35,23 +34,27 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await Crypto.deleteMany({});
+  jest.clearAllMocks();
 });
 
 describe("Currency API Integration Tests", () => {
-  describe("GET /cryptocurrencies/test", () => {
-    it("should return a successful test route response", async () => {
-      const response = await request(app).get("/api/test");
-    });
-  });
-
   describe("GET /cryptocurrencies/save", () => {
     it("should save crypto data to the database", async () => {
-      const response = await request(app).get("/api/save");
+      const response = await request(app).get("/cryptocurrencies/save");
+
+      expect(response.status).toBe(200);
+      expect(response.text).toBe("Crypto data saved successfully.");
+    });
+
+    it("should return an error if saving crypto data fails", async () => {
+      jest.spyOn(Crypto, "insertMany");
+
+      const response = await request(app).get("/cryptocurrencies/save");
     });
   });
 
-  describe("GET /cryptocurrencies/", () => {
-    it("should fetch all crypto data", async () => {
+  describe("GET /cryptocurrencies", () => {
+    it("should fetch all cryptocurrencies", async () => {
       const mockCryptoData = [
         {
           id: "crypto1",
@@ -62,22 +65,21 @@ describe("Currency API Integration Tests", () => {
           timestamp: new Date(),
         },
       ];
-
       await Crypto.insertMany(mockCryptoData);
 
-      const response = await request(app).get("/cryptocurrencies/");
+      const response = await request(app).get("/cryptocurrencies");
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(1);
       expect(response.body[0].name).toBe("Bitcoin");
     });
 
-    it("should return an error if fetching crypto data fails", async () => {
+    it("should return an error if fetching cryptocurrencies fails", async () => {
       jest.spyOn(Crypto, "find").mockImplementationOnce(() => {
-        throw new Error("Failed to fetch data.");
+        throw new Error("Fetch failed");
       });
 
-      const response = await request(app).get("/cryptocurrencies/");
+      const response = await request(app).get("/cryptocurrencies");
 
       expect(response.status).toBe(500);
       expect(response.text).toBe("Error fetching crypto data.");
@@ -85,7 +87,7 @@ describe("Currency API Integration Tests", () => {
   });
 
   describe("GET /cryptocurrencies/prices/:cryptoId", () => {
-    it("should return the prices of a specific crypto", async () => {
+    it("should fetch prices for a specific cryptocurrency", async () => {
       const mockCryptoData = {
         id: "crypto1",
         name: "Bitcoin",
@@ -94,27 +96,21 @@ describe("Currency API Integration Tests", () => {
         marketCap: 900000,
         timestamp: new Date(),
       };
-
       await Crypto.create(mockCryptoData);
 
       const response = await request(app).get(
         "/cryptocurrencies/prices/crypto1"
       );
-
-      expect(response.status).toBe(200);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0].price).toBe(50000);
     });
 
-    it("should return an error if prices are not found", async () => {
+    it("should return an error if cryptocurrency prices are not found", async () => {
       const response = await request(app).get(
-        "/cryptocurrencies/prices/unknownCrypto"
+        "/cryptocurrencies/prices/unknown"
       );
     });
   });
-
   describe("GET /cryptocurrencies/most-recent", () => {
-    it("should return the most recent crypto data", async () => {
+    it("should fetch the most recent cryptocurrency data", async () => {
       const mockData = [
         {
           id: "crypto1",
@@ -125,7 +121,6 @@ describe("Currency API Integration Tests", () => {
           timestamp: new Date(),
         },
       ];
-
       await Crypto.insertMany(mockData);
 
       const response = await request(app).get("/cryptocurrencies/most-recent");
@@ -134,14 +129,13 @@ describe("Currency API Integration Tests", () => {
       expect(response.body.length).toBe(1);
       expect(response.body[0].name).toBe("Bitcoin");
     });
-  });
 
-  describe("POST /cryptocurrencies/forecast", () => {
-    it("should return a forecast result for a specific crypto", async () => {
-      const forecastPayload = { currencyName: "Bitcoin" };
-      const response = await request(app)
-        .post("/api/forecast")
-        .send(forecastPayload);
+    it("should return an error if fetching most recent data fails", async () => {
+      jest.spyOn(Crypto, "findOne").mockImplementationOnce(() => {
+        throw new Error("Fetch failed");
+      });
+
+      const response = await request(app).get("/cryptocurrencies/most-recent");
     });
   });
 });

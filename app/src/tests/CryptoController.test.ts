@@ -6,7 +6,6 @@ import {
   forecastCryptoPrices,
   getMostRecentCryptoPrices,
 } from "../application/controllers/CryptoController";
-import { CurrencyRepository } from "~/infra/repositories/CurrencyRepository";
 
 jest.mock("../domain/entities/Crypto/Crypto");
 
@@ -22,16 +21,20 @@ jest.mock("../domain/entities/Crypto/Crypto");
 jest.mock("../infra/repositories/CurrencyRepository", () => {
   return jest.fn().mockImplementation(() => {
     return {
+      //@ts-expect-error
       getAllCryptoDataFromDate: jest.fn().mockResolvedValue([
         { name: "Bitcoin", priceUsd: 50000, timestamp: new Date() },
         { name: "Bitcoin", priceUsd: 52000, timestamp: new Date() },
       ]),
+
       saveCryptoData: jest.fn(),
       getMostRecentPrices: jest.fn(),
+      //@ts-expect-error
       getAllCryptoData: jest.fn().mockResolvedValue([
         { name: "Bitcoin", priceUsd: 50000, timestamp: new Date() },
         { name: "Bitcoin", priceUsd: 51000, timestamp: new Date() },
       ]),
+      //@ts-expect-error
       getMostRecentPrices: jest.fn().mockResolvedValue([
         {
           id: "crypto1",
@@ -73,7 +76,7 @@ describe("CryptoController", () => {
         },
       ];
       validateData(data);
-
+      //@ts-expect-error
       jest.spyOn(Crypto, "find").mockResolvedValue(data);
 
       await saveCryptoDataToDB();

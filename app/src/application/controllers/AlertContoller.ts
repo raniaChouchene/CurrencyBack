@@ -1,5 +1,6 @@
 import Crypto from "~/domain/entities/Crypto/Crypto";
 import Alert from "~/domain/entities/Crypto/Alert";
+import cron from "node-cron";
 
 const jwt = require("jsonwebtoken");
 import nodemailer from "nodemailer";
@@ -20,11 +21,20 @@ export const handleSetAlert = async (req, res) => {
     if (!cryptoId) {
       return res.status(400).json({ message: "Crypto ID is required" });
     }
-    const crypto = await Crypto.findById(cryptoId);
+
+    console.log("Searching for crypto with name:", cryptoId);
+    const crypto = await Crypto.findOne({
+      //@ts-expect-error
+      name: new RegExp(`^${cryptoId}$`, "i"),
+    });
+
     if (!crypto) {
-      console.log("Crypto not found with name:", cryptoId);
+      console.log(`No cryptocurrency found with name: ${cryptoId}`);
       return res.status(404).json({ message: "Cryptocurrency not found" });
     }
+
+    console.log("Found cryptocurrency:", crypto);
+
     const alert = new Alert({
       userId,
       cryptoId: crypto._id,
@@ -120,9 +130,9 @@ export const monitorAlerts = async () => {
   }
 };
 
-/* cron.schedule("* * * * *", async () => {
+/*cron.schedule("* * * * *", async () => {
   console.log("Running scheduled monitorAlerts...");
   await monitorAlerts();
-}); */
+});*/
 
 module.exports = { handleSetAlert, fetchAlertHistory, monitorAlerts };
