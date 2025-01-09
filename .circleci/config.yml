@@ -9,6 +9,9 @@ jobs:
     steps:
       - checkout
 
+      - setup_remote_docker:
+          docker_layer_caching: true
+
       - run:
           name: Install dependencies
           command: npm install
@@ -30,29 +33,29 @@ jobs:
           name: List project files
           command: ls -R .
 
-  #     - run:
-  #         name: Build Docker image
-  #         command: |
-  #           docker info
-  #           docker build -t raniaaa/currencyfront:$CIRCLE_SHA1 .
+      - run:
+          name: Build Docker image
+          command: |
+            docker info
+            docker build -t raniaaa/currencyfront:$CIRCLE_SHA1 .
 
-  #     - run:
-  #         name: Push Docker image to Docker Hub
-  #         command: |
-  #           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-  #           docker push raniaaa/currencyfront:$CIRCLE_SHA1
+      - run:
+          name: Push Docker image to Docker Hub
+          command: |
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push raniaaa/currencyfront:$CIRCLE_SHA1
 
-  # deploy-to-kubernetes:
-  #   docker:
-  #     - image: lachlanevenson/k8s-kubectl:latest
-  #   steps:
-  #     - checkout
+  deploy-to-kubernetes:
+    docker:
+      - image: lachlanevenson/k8s-kubectl:latest
+    steps:
+      - checkout
 
-  #     - run:
-  #         name: Deploy to Kubernetes
-  #         command: |
-  #           kubectl set image deployment/frontend frontend=raniaaa/currencyfront:$CIRCLE_SHA1
-  #           kubectl rollout status deployment/frontend
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            kubectl set image deployment/frontend frontend=raniaaa/currencyfront:$CIRCLE_SHA1
+            kubectl rollout status deployment/frontend
 
 workflows:
   version: 2
@@ -63,10 +66,10 @@ workflows:
             branches:
               only:
                 - main
-      # - deploy-to-kubernetes:
-      #     requires:
-      #       - build-and-test
-      # filters:
-      #   branches:
-      #     only:
-      #       - main
+      - deploy-to-kubernetes:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - main
